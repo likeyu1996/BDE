@@ -1,0 +1,43 @@
+# -*- encoding: gbk -*-
+import Cdf
+def is_chinese(uchar):
+        """判断一个unicode是否是汉字"""
+        if uchar >= u'\u4E00' and uchar <= u'\u9FA5':
+            return True
+        else:
+            return False
+def count_chinese_word(filepath, encoding):
+    _dict = {}
+    try:
+        with open (filepath, 'r') as txt_file:
+            for line in txt_file:
+                ustr = line.decode(encoding,'ignore')
+                for uchar in ustr:
+                    if is_chinese(uchar):
+                        if _dict.has_key(uchar):
+                            _dict[uchar] = _dict[uchar] + 1
+                        else:
+                            _dict[uchar] = 1
+    except IOError as ioerr:
+        print "文件",filepath,"不存在"
+    return _dict
+'''def printf(set_common, *dcts):
+    lst_common = list(set_common)
+    for i in lst_common:
+        print "%s: %d, %d" % (i, dcts[0][i], dcts[1][i]) '''
+if __name__ == '__main__':
+    import sys
+    reload(sys)
+    sys.setdefaultencoding( "utf-8" )
+    dict_hlm = count_chinese_word('../hlm.txt', 'gbk')
+    dict_qyz = count_chinese_word('../qyz.txt', 'gbk')
+    set_hlm=set(i[0] for i in sorted(dict_hlm.items(), key=lambda d: d[1], reverse=True)[:100])
+    set_qyz=set(i[0] for i in sorted(dict_qyz.items(), key=lambda d: d[1], reverse=True)[:100])
+    z1=sum(dict_hlm.values())
+    z2=sum(dict_qyz.values())
+    common_hlm_qyz=set_hlm&set_qyz
+    n=0
+    for i in common_hlm_qyz:
+        n+=1
+        print n,i,'%.5f'%(dict_hlm[i]/float(z1)),'%.5f'%(dict_qyz[i]/float(z2))
+    '''关于print的格式还是有很多不懂，不能随心所欲的打印出自己想要的格式，比如“1.一：0.016555 0.02324”'''
